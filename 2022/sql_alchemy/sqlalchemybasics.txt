@@ -1,0 +1,5 @@
+ORM - object relational mapping;
+what is object relational mapping - technique to conver data between incompatible type systems in OOP languages (objects in my code, primary data in my database);
+each class maps to a- table;
+DBAPI - a standard for python libraries that allows them to connec to databases
+list of DB-API modules - for SQLite sqlite3
