@@ -26,14 +26,17 @@ serializable and snapshot both prevent all read phonemena.
 
 pessimistic database implementation -  row level locks, table locks, page locks to avoid lost updates
 optimistic database implementation - no locks, jsut track if things change and fail the transaction if so
-downside of lockng -expensive
-
+downside of lockng -expensive;
+how do you inforce consistency in data - atomicity, referential integrity (foreign keys), isolation
 
 there is a wiki table that shows whih read phenomena vs isolation levels that is a good guide.
 
+
+consistency example-
 atomicity -all queries in a transaction must succeed. If one query fails, all prior successful queries in the transaction should rollback. if database crashes during a transaction all successful queries in the transactions should rollback;
 isolation -
-consistency -
+
+consistency -consistency in data (what is on disk), consistency in reads
 durability -
 
 some transactions are read only. some change data
