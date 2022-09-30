@@ -31,3 +31,19 @@ players = Table(
 	)
 
 meta.create_all(engine)
+
+conn = engine.connect()
+
+# Insert 1 student
+insert = students.insert().values(name = "Sam", lastname = 'Peterson')
+result = conn.execute(insert)
+print(result.inserted_primary_key)
+
+#insert a dictionary of students
+conn.execute(students.insert(), [
+{'name': 'Frodo', 'lastname' : 'Baggins'},
+{'name': 'Samwise', 'lastname' : 'Gamgee'},
+{'name': 'Meriadoc', 'lastname' : 'Brandybuck'},
+{'name': 'Peregrin', 'lastname' : 'Took'},
+])
+
