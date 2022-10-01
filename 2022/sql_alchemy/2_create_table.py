@@ -9,6 +9,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy.sql import select
 
 engine = create_engine('sqlite:///example.db', echo = True)
 meta = MetaData()
@@ -47,3 +48,21 @@ conn.execute(students.insert(), [
 {'name': 'Peregrin', 'lastname' : 'Took'},
 ])
 
+#Select Rows
+select_students = students.select()
+result = conn.execute(select_students)
+row = result.fetchone()
+
+for row in result:
+	print(row)
+
+#Select with a 'where" condition
+select_students = students.select().where(students.c.id>2)
+result = conn.execute(select_students)
+row = result.fetchone()
+
+for row in result:
+	print(row)
+# using select
+s = select([students])
+result = conn.execute(s)

@@ -30,19 +30,29 @@ downside of lockng -expensive;
 how do you inforce consistency in data - atomicity, referential integrity (foreign keys), isolation
 
 there is a wiki table that shows whih read phenomena vs isolation levels that is a good guide.
-
+durability - the power can be shut down right now and i will not lose any of my commits;
 
 consistency example-
 atomicity -all queries in a transaction must succeed. If one query fails, all prior successful queries in the transaction should rollback. if database crashes during a transaction all successful queries in the transactions should rollback;
 isolation -
 
 consistency -consistency in data (what is on disk), consistency in reads
-durability -
+durability -changes made by committed transactions must be persisted in a durable non-volatile storage
 
+durability techniques - WAL (Write ahead log), asynchronous snapshot, AOF
+WAL (write ahead log) -compressed version of database changes
+
+writing a lof of data to disk is expensive.
+Asynchronous snapshot -
+AOF - 
 some transactions are read only. some change data
 some databases write immediately to disk (slow) and some write to memory. it is a trade off.
 your database should clean up sucessful queries in a crashed transaction. rollback ALL changes;
 isolation main question: can my inflight transaction see changes made by other transactions?
 queries need to be bounded!
 
+OS cache - a write request in an OS goes to the OS cache. these writes are batched so they can be committed to disk all at once
 
+what can happens becuse of OS cache to a database write if the OS crashes - you might have a loss of data;
+
+Fsync OS command - forces all commites to be written to disk
