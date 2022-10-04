@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy.sql import select
+from sqlalchemy import text
 
 engine = create_engine('sqlite:///example.db', echo = True)
 meta = MetaData()
@@ -66,3 +67,15 @@ for row in result:
 # using select
 s = select([students])
 result = conn.execute(s)
+
+#textual SQL, for when you just want to write plain SQL
+print("Textual SQL")
+t = text("SELECT * FROM students")
+result = conn.execute(t)
+row = result .fetchone()
+for row in result:
+	print(row)
+
+# textual SQL with Bound paramaters
+s = text("select students.name, students.lastname from students where students.name between :x and : y")
+conn.execute(s, x = 'A', y = 'L').fetchall()

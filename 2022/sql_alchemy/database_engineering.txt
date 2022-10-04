@@ -1,4 +1,3 @@
-ACID - atomicity,consistency,isolation, durability;
 database transaction-a collection of SQL queries treated as one unit of work;
 example of a database transation - account deposit (SELECT data, UPDATE new account, UPDATE old account);
 transaction COMMIT - queries persist 
