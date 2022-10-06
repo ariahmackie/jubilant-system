@@ -5,44 +5,40 @@
 # 5. Call meta.create_all method.
 
 
-
+import os
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
-from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy import Table, Column, Integer, String, ForeignKey
 from sqlalchemy.sql import select
 from sqlalchemy import text
+from sqlalchemy.sql import alias
 
-engine = create_engine('sqlite:///example.db', echo = True)
+#Delete a Database
+#os.remove("lotr.db")
+
+# Create Engine
+engine = create_engine('sqlite:///lotr.db', echo = True)
 meta = MetaData()
 
-# create students table
-students = Table(
-	'students', meta,
+# Create a Table
+hobbits = Table(
+	'Hobbits', meta,
 	Column('id', Integer, primary_key = True),
 	Column('name', String),
 	Column('lastname', String),
-)
-
-#create player table
-players = Table(
-	'players', meta,
-	Column('id', Integer, primary_key = True),
-	Column('username', String),
-	Column('email', String),
-	Column('password', String),
 	)
 
 meta.create_all(engine)
 
 conn = engine.connect()
 
-# Insert 1 student
-insert = students.insert().values(name = "Sam", lastname = 'Peterson')
+# Insert 1 Hobbit
+insert = hobbits.insert().values(name = "Rosey", lastname = 'Cotton')
 result = conn.execute(insert)
 print(result.inserted_primary_key)
 
 #insert a dictionary of students
-conn.execute(students.insert(), [
+conn.execute(hobbits.insert(), [
 {'name': 'Frodo', 'lastname' : 'Baggins'},
 {'name': 'Samwise', 'lastname' : 'Gamgee'},
 {'name': 'Meriadoc', 'lastname' : 'Brandybuck'},
@@ -50,32 +46,101 @@ conn.execute(students.insert(), [
 ])
 
 #Select Rows
-select_students = students.select()
-result = conn.execute(select_students)
+select_hobbits = hobbits.select()
+result = conn.execute(select_hobbits)
 row = result.fetchone()
 
 for row in result:
 	print(row)
 
 #Select with a 'where" condition
-select_students = students.select().where(students.c.id>2)
-result = conn.execute(select_students)
+select_hobbits = hobbits.select().where(hobbits.c.id>2)
+result = conn.execute(select_hobbits)
 row = result.fetchone()
 
 for row in result:
 	print(row)
+
 # using select
-s = select([students])
+s = select([hobbits])
 result = conn.execute(s)
 
 #textual SQL, for when you just want to write plain SQL
 print("Textual SQL")
-t = text("SELECT * FROM students")
+t = text("SELECT * FROM Hobbits")
 result = conn.execute(t)
-row = result .fetchone()
+row = result.fetchone()
 for row in result:
 	print(row)
 
-# textual SQL with Bound paramaters
-s = text("select students.name, students.lastname from students where students.name between :x and : y")
-conn.execute(s, x = 'A', y = 'L').fetchall()
+# textual SQL with Bound paramaters - one way to do this, there are others
+# https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_core_using_aliases.htm
+print("######################")
+print("textual SQL with bound parameters")
+s = text("select hobbits.name, hobbits.lastname from hobbits where hobbits.name between :x and :y")
+result = conn.execute(s, x = 'C', y = 'G')
+row = result.fetchone()
+for row in result:
+	print(row)
+
+# Alias example - giving a table a temporary name that is more conveinant or readable
+print("###################")
+print("Alias example")
+h = hobbits.alias("hob")
+query = select([h]).where(h.c.id >2)
+
+# This is SELECT stud.id, stud.name, stud.lastname FROM Students WHERE stud.id > 1
+result = conn.execute(query)
+for row in result:
+	print(row)
+
+# Update example
+#table.update().where(conditions).values(SET expressions)
+print("##################################")
+print("Update Example.")
+query = hobbits.update().where(hobbits.c.lastname == 'Took').values(lastname = 'T')
+conn.execute(query)
+query2 = hobbits.select()
+result = conn.execute(query2) 
+
+row = result.fetchone()
+for row in result:
+	print(row)
+
+# Delete Example
+print("##################################3")
+print("Delete Example")
+stmt = hobbits.delete().where(hobbits.c.name == 'Frodo')
+conn.execute(stmt)
+selection = hobbits.select()
+result = conn.execute(selection)
+row = result.fetchone()
+for row in result:
+	print(row)
+
+# Using Many Tables
+
+print("#############################")
+print("Using Multiple Tables")
+engine = create_engine('sqlite:///college.db', echo = True)
+meta = MetaData()
+
+students = Table(
+	'students', meta,
+	Column('id', Integer, primary_key = True),
+	Column('name', String),
+	Column('lastname', String),
+	Column('grade', String),
+	Column('class_id', Integer, ForeignKey("classes.id"))
+)
+
+classes = Table(
+	'classes', meta,
+	Column('id', Integer, primary_key = True),
+	Column('name', String),
+	Column('room', Integer),
+)
+
+meta.create_all(engine)
+
+
