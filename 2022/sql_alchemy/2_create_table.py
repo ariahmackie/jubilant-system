@@ -14,8 +14,8 @@ from sqlalchemy import text
 from sqlalchemy.sql import alias
 
 #Delete a Database
-#os.remove("lotr.db")
-
+os.remove("lotr.db")
+os.remove("college.db")
 # Create Engine
 engine = create_engine('sqlite:///lotr.db', echo = True)
 meta = MetaData()
@@ -124,7 +124,7 @@ print("#############################")
 print("Using Multiple Tables")
 engine = create_engine('sqlite:///college.db', echo = True)
 meta = MetaData()
-
+conn = engine.connect()
 students = Table(
 	'students', meta,
 	Column('id', Integer, primary_key = True),
@@ -138,9 +138,34 @@ classes = Table(
 	'classes', meta,
 	Column('id', Integer, primary_key = True),
 	Column('name', String),
-	Column('room', Integer),
+	Column('room_num', Integer),
 )
 
 meta.create_all(engine)
 
+conn.execute(classes.insert(), [
+{'name': 'world history', 'room_num': 12},
+{'name': "theater", 'room_num': 13},
+{'name': 'math 1', 'room_num': 25},
+{'name': 'chem 2', 'room_num': 31}
+
+])
+
+conn.execute(students.insert(), [
+{'name': 'Bob', 'lastname': 'Oswald', 'grade': 'B+', 'class_id': 1},
+{'name': 'Allan', 'lastname': 'A', 'grade' : 'A-', 'class_id': 2},
+{'name': 'Rebecca', 'lastname': 'V', 'grade': 'C',  'class_id': 3},
+])
+
+
+s = select([students, classes]).where(classes.c.id==students.c.class_id)
+result = conn.execute(s)
+for row in result:
+	print(row)
+
+# you can't  use UPDATE with multiple tables in sqlite - skip "using multiple table updates
+
+#parameter ordered updates 
+print("####################################")
+print("Parameter Ordered Updates")
 
